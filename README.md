@@ -97,9 +97,6 @@ Contributions and suggestions are welcome!
 4. Test the application.
 5. Submit a pull request describing your improvements.
 
-## 📄 License
-
-This project can be released under the MIT License. Add a `LICENSE` file to the repository if you choose to distribute it under that license.
 
 ## 👨‍💻 Developed For
 
