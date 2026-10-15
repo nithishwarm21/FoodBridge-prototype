@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FoodBridge – Share Food. Reduce Waste. Feed Hope.</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* ---------- Design tokens ---------- */
+:root{
+  --green:#1f7a4d; --green-d:#14583a; --green-l:#e6f4ec;
+  --orange:#f08a24; --orange-l:#fff1e1;
+  --bg:#f6faf7; --card:#fff; --text:#1b2b23; --muted:#66776e; --line:#e3ece6;
+  --red:#c0392b; --red-l:#fdecea;
+  --shadow:0 2px 14px rgba(20,88,58,.08);
+  --head:'Bricolage Grotesque',system-ui,sans-serif;
+  --body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--bg);color:var(--text);line-height:1.5;display:flex;min-height:100vh}
+h1,h2,h3{font-family:var(--head);line-height:1.15}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+
+/* ---------- Sidebar (desktop) / bottom bar (mobile) ---------- */
+.side{width:240px;background:var(--green-d);color:#fff;padding:24px 16px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.logo{font:800 1.45rem var(--head);padding:0 10px 22px;display:flex;align-items:center;gap:10px}
+.logo i{color:var(--orange)}
+.nav{background:none;border:0;color:#cfe8da;text-align:left;padding:12px 14px;border-radius:12px;cursor:pointer;display:flex;gap:12px;align-items:center;transition:.2s}
+.nav:hover{background:rgba(255,255,255,.1)}
+.nav.on{background:#fff;color:var(--green-d);font-weight:600}
+.nav i{width:20px;text-align:center}
+.side small{margin-top:auto;color:#9fc7b0;padding:0 10px;font-size:.75rem}
+
+main{flex:1;padding:28px;max-width:1100px;margin:0 auto;width:100%}
+.view{display:none}.view.on{display:block}
+
+/* ---------- Hero ---------- */
+.hero{background:linear-gradient(120deg,var(--green) 0%,var(--green-d) 100%);color:#fff;border-radius:22px;padding:36px;margin-bottom:24px;position:relative;overflow:hidden}
+.hero::after{content:"\f4d8";font-family:"Font Awesome 6 Free";font-weight:900;position:absolute;right:28px;bottom:-30px;font-size:11rem;color:rgba(255,255,255,.07)}
+.hero h1{font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:8px}
+.hero p{max-width:520px;color:#d4ecdf;margin-bottom:20px}
+
+/* ---------- Buttons ---------- */
+.btn{border:0;border-radius:12px;padding:11px 20px;font-weight:600;cursor:pointer;transition:.2s;display:inline-flex;gap:8px;align-items:center}
+.btn-o{background:var(--orange);color:#fff}.btn-o:hover{background:#d97706;transform:translateY(-1px)}
+.btn-g{background:var(--green);color:#fff}.btn-g:hover{background:var(--green-d)}
+.btn-l{background:var(--green-l);color:var(--green-d)}.btn-l:hover{background:#d3ecde}
+.btn:disabled{opacity:.6;cursor:wait}
+
+/* ---------- Cards ---------- */
+.grid{display:grid;gap:16px}
+.stats{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-bottom:24px}
+.card{background:var(--card);border-radius:18px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--line)}
+.stat{display:flex;gap:14px;align-items:center}
+.stat .ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:1.2rem;background:var(--green-l);color:var(--green)}
+.stat:nth-child(2) .ic{background:var(--orange-l);color:var(--orange)}
+.stat b{font:800 1.8rem var(--head);display:block;line-height:1}
+.stat span{color:var(--muted);font-size:.85rem}
+h2{font-size:1.35rem;margin-bottom:14px}
+
+/* ---------- Donation cards & badges ---------- */
+.dgrid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+.don{transition:.2s;display:flex;flex-direction:column;gap:10px}
+.don:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(20,88,58,.13)}
+.don h3{font-size:1.1rem}
+.meta{color:var(--muted);font-size:.88rem;display:grid;gap:3px}
+.meta i{width:16px;color:var(--green)}
+.badge{font-size:.75rem;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.b-available{background:var(--green-l);color:var(--green-d)}
+.b-claimed{background:var(--orange-l);color:#b45f00}
+.b-completed{background:#e8eefc;color:#2f4ea3}
+.b-expired{background:var(--red-l);color:var(--red)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.don .btn{margin-top:auto;justify-content:center}
+
+/* ---------- Activity ---------- */
+.act{list-style:none;display:grid;gap:12px}
+.act li{display:flex;gap:12px;align-items:flex-start;font-size:.93rem}
+.act .dot{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--green-l);color:var(--green);flex-shrink:0;font-size:.85rem}
+.act time{color:var(--muted);font-size:.78rem;display:block}
+
+/* ---------- Forms ---------- */
+form{display:grid;gap:14px;max-width:620px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+label{font-weight:600;font-size:.88rem;display:grid;gap:6px}
+input,select,textarea{border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;transition:.2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--green);outline:none;box-shadow:0 0 0 3px var(--green-l)}
+.err{color:var(--red);font-size:.8rem;font-weight:500;min-height:0}
+.invalid{border-color:var(--red)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 16px;cursor:pointer;transition:.2s;font-size:.88rem}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+
+/* ---------- States: empty, loading, toast ---------- */
+.empty{text-align:center;padding:40px 16px;color:var(--muted)}
+.empty i{font-size:2.4rem;color:#b9d6c5;margin-bottom:10px;display:block}
+.skel{height:150px;border-radius:18px;background:linear-gradient(90deg,#e9f1ec 25%,#f5faf7 50%,#e9f1ec 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+#toasts{position:fixed;top:18px;right:18px;display:grid;gap:10px;z-index:50}
+.toast{background:var(--green-d);color:#fff;padding:12px 18px;border-radius:12px;box-shadow:var(--shadow);animation:in .3s;display:flex;gap:10px;align-items:center}
+.toast.bad{background:var(--red)}
+@keyframes in{from{opacity:0;transform:translateX(30px)}}
+.foot{margin-top:28px;text-align:right}
+.foot button{background:none;border:0;color:var(--muted);cursor:pointer;font-size:.8rem;text-decoration:underline}
+
+/* ---------- Responsive ---------- */
+@media(max-width:800px){
+  body{flex-direction:column}
+  .side{position:fixed;bottom:0;top:auto;left:0;right:0;width:100%;height:auto;flex-direction:row;padding:6px;z-index:20;justify-content:space-around;gap:0}
+  .logo,.side small{display:none}
+  .nav{flex-direction:column;gap:2px;font-size:.7rem;padding:8px 10px;flex:1;align-items:center}
+  main{padding:16px 16px 100px}
+  .hero{padding:26px 20px}
+  .two{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<aside class="side">
+  <div class="logo"><i class="fa-solid fa-bowl-food"></i>FoodBridge</div>
+  <button class="nav on" data-v="dash"><i class="fa-solid fa-chart-pie"></i>Dashboard</button>
+  <button class="nav" data-v="browse"><i class="fa-solid fa-basket-shopping"></i>Browse</button>
+  <button class="nav" data-v="donate"><i class="fa-solid fa-hand-holding-heart"></i>Donate</button>
+  <small>Hackathon demo · data stays in your browser</small>
+</aside>
+
+<main>
+  <!-- Dashboard -->
+  <section class="view on" id="dash">
+    <div class="hero">
+      <h1>Share Food. Reduce Waste. Feed Hope.</h1>
+      <p>FoodBridge connects restaurants, events and households with NGOs and volunteers who can deliver surplus food while it is still fresh.</p>
+      <button class="btn btn-o" data-go="donate"><i class="fa-solid fa-plus"></i>Donate food</button>
+    </div>
+    <div class="grid stats" id="stats"></div>
+    <div class="card"><h2>Recent activity</h2><ul class="act" id="activity"></ul></div>
+  </section>
+
+  <!-- Browse & claim -->
+  <section class="view" id="browse">
+    <h2>Available donations</h2>
+    <div class="filters" id="filters"></div>
+    <div class="grid dgrid" id="list"></div>
+  </section>
+
+  <!-- Donate form -->
+  <section class="view" id="donate">
+    <h2>Donate food</h2>
+    <div class="card">
+      <form id="form" novalidate>
+        <label>Donor name<input name="donor" placeholder="e.g. Annapurna Restaurant"><span class="err"></span></label>
+        <label>Food description<input name="food" placeholder="e.g. Vegetable biryani and raita"><span class="err"></span></label>
+        <div class="two">
+          <label>Servings (meals)<input name="qty" type="number" min="1" placeholder="25"><span class="err"></span></label>
+          <label>Food type
+            <select name="type"><option>Cooked meal</option><option>Bakery</option><option>Fruits &amp; vegetables</option><option>Packaged food</option></select>
+          </label>
+        </div>
+        <div class="two">
+          <label>Pickup address<input name="addr" placeholder="Street, area"><span class="err"></span></label>
+          <label>Best before<input name="exp" type="datetime-local"><span class="err"></span></label>
+        </div>
+        <button class="btn btn-g" id="sub" type="submit"><i class="fa-solid fa-paper-plane"></i>Post donation</button>
+      </form>
+    </div>
+  </section>
+
+  <div class="foot"><button id="reset">Reset demo data</button></div>
+</main>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+/* ---------- State & storage ---------- */
+const KEY='foodbridge.v1';
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+let db=load(), filter='all';
+
+function seed(){
+  const h=n=>new Date(Date.now()+n*36e5).toISOString(), ago=n=>new Date(Date.now()-n*6e4).toISOString();
+  return {
+    donations:[
+      {id:1,donor:'Annapurna Restaurant',food:'Vegetable biryani and raita',qty:40,type:'Cooked meal',addr:'T. Nagar, Chennai',exp:h(4),status:'available'},
+      {id:2,donor:'Sunrise Bakery',food:'Bread loaves and buns',qty:30,type:'Bakery',addr:'Adyar, Chennai',exp:h(10),status:'available'},
+      {id:3,donor:'Green Basket Market',food:'Mixed vegetables crate',qty:60,type:'Fruits & vegetables',addr:'Anna Nagar, Chennai',exp:h(30),status:'claimed',by:'Hope NGO'},
+      {id:4,donor:'Meena Iyer',food:'Wedding leftovers, sweets',qty:25,type:'Cooked meal',addr:'Velachery, Chennai',exp:h(-2),status:'completed',by:'Seva Volunteers'}
+    ],
+    log:[
+      {t:ago(240),m:'Seva Volunteers delivered 25 meals from Meena Iyer'},
+      {t:ago(90),m:'Hope NGO claimed Mixed vegetables crate'},
+      {t:ago(20),m:'Sunrise Bakery posted Bread loaves and buns'}
+    ]};
+}
+function load(){try{return JSON.parse(localStorage[KEY])}catch{return seed()}}
+function save(){localStorage[KEY]=JSON.stringify(db)}
+function log(m){db.log.unshift({t:new Date().toISOString(),m});db.log=db.log.slice(0,15)}
+
+/* ---------- Helpers ---------- */
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const status=d=>d.status==='available'&&new Date(d.exp)<new Date()?'expired':d.status;
+function ago(t){const m=Math.max(1,Math.round((Date.now()-new Date(t))/6e4));return m<60?m+' min ago':m<1440?Math.round(m/60)+' h ago':Math.round(m/1440)+' d ago'}
+function toast(msg,bad){const e=document.createElement('div');e.className='toast'+(bad?' bad':'');e.innerHTML=`<i class="fa-solid ${bad?'fa-circle-exclamation':'fa-circle-check'}"></i>${esc(msg)}`;$('#toasts').append(e);setTimeout(()=>e.remove(),3200)}
+
+/* ---------- Rendering ---------- */
+function renderStats(){
+  const d=db.donations, av=d.filter(x=>status(x)==='available').length,
+    cl=d.filter(x=>['claimed','completed'].includes(x.status)).length,
+    meals=d.filter(x=>x.status==='completed').reduce((s,x)=>s+x.qty,0);
+  const items=[['fa-box-open','Total donations',d.length],['fa-clock','Available now',av],['fa-handshake','Claimed',cl],['fa-utensils','Meals shared',meals]];
+  $('#stats').innerHTML=items.map(i=>`<div class="card stat"><div class="ic"><i class="fa-solid ${i[0]}"></i></div><div><b>${i[2]}</b><span>${i[1]}</span></div></div>`).join('');
+  $('#activity').innerHTML=db.log.length?db.log.slice(0,6).map(l=>`<li><div class="dot"><i class="fa-solid fa-leaf"></i></div><div>${esc(l.m)}<time>${ago(l.t)}</time></div></li>`).join('')
+    :'<div class="empty"><i class="fa-regular fa-comment-dots"></i>No activity yet. Post the first donation.</div>';
+}
+function renderFilters(){
+  $('#filters').innerHTML=['all','available','claimed','completed'].map(f=>`<button class="chip ${f===filter?'on':''}" data-f="${f}">${f[0].toUpperCase()+f.slice(1)}</button>`).join('');
+}
+function renderList(){
+  const rows=db.donations.filter(d=>filter==='all'||status(d)===filter).sort((a,b)=>b.id-a.id);
+  $('#list').innerHTML=rows.length?rows.map(d=>{
+    const s=status(d);
+    const act=s==='available'?`<button class="btn btn-g" data-act="claim" data-id="${d.id}"><i class="fa-solid fa-hand"></i>Claim pickup</button>`
+      :s==='claimed'?`<button class="btn btn-o" data-act="done" data-id="${d.id}"><i class="fa-solid fa-truck"></i>Mark delivered</button>`:'';
+    return `<article class="card don"><div class="row"><h3>${esc(d.food)}</h3><span class="badge b-${s}">${s}</span></div>
+      <div class="meta"><span><i class="fa-solid fa-store"></i>${esc(d.donor)}</span><span><i class="fa-solid fa-location-dot"></i>${esc(d.addr)}</span>
+      <span><i class="fa-solid fa-utensils"></i>${d.qty} meals · ${esc(d.type)}</span>
+      <span><i class="fa-regular fa-clock"></i>Best before ${new Date(d.exp).toLocaleString([], {dateStyle:'medium',timeStyle:'short'})}</span>
+      ${d.by?`<span><i class="fa-solid fa-user-check"></i>${esc(d.by)}</span>`:''}</div>${act}</article>`}).join('')
+    :`<div class="empty card" style="grid-column:1/-1"><i class="fa-solid fa-bowl-rice"></i>No ${filter==='all'?'':filter+' '}donations right now.<br>Check back soon or post one yourself.</div>`;
+}
+const render=()=>{renderStats();renderFilters();renderList()};
+
+/* ---------- Navigation ---------- */
+function go(v){
+  $$('.view').forEach(e=>e.classList.toggle('on',e.id===v));
+  $$('.nav').forEach(e=>e.classList.toggle('on',e.dataset.v===v));
+  if(v==='browse'){ // brief loading skeleton for feedback
+    $('#list').innerHTML='<div class="skel"></div>'.repeat(3);
+    setTimeout(renderList,350);
+  } else render();
+  scrollTo({top:0});
+}
+document.addEventListener('click',e=>{
+  const n=e.target.closest('[data-v],[data-go]');if(n)return go(n.dataset.v||n.dataset.go);
+  const f=e.target.closest('[data-f]');if(f){filter=f.dataset.f;render()}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const d=db.donations.find(x=>x.id==b.dataset.id);
+  if(b.dataset.act==='claim'){
+    const who=prompt('Your NGO or volunteer name:');
+    if(!who||!who.trim())return toast('Enter a name to claim this donation.',true);
+    d.status='claimed';d.by=who.trim();log(`${d.by} claimed ${d.food}`);toast('Donation claimed. Head to the pickup address.');
+  }else{
+    d.status='completed';log(`${d.by} delivered ${d.qty} meals from ${d.donor}`);toast(`${d.qty} meals delivered. Thank you!`);
+  }
+  save();render();
+});
+
+/* ---------- Donate form with validation ---------- */
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const f=e.target,v=Object.fromEntries(new FormData(f));let ok=true;
+  const rules={donor:'Enter your name.',food:'Describe the food.',qty:'Enter at least 1 serving.',addr:'Enter a pickup address.',exp:'Choose a future best-before time.'};
+  for(const k in rules){
+    const el=f[k],bad=!String(v[k]).trim()||(k==='qty'&&+v.qty<1)||(k==='exp'&&new Date(v.exp)<=new Date());
+    el.classList.toggle('invalid',bad);el.nextElementSibling.textContent=bad?rules[k]:'';if(bad)ok=false;
+  }
+  if(!ok)return toast('Fix the highlighted fields and try again.',true);
+  const btn=$('#sub');btn.disabled=true;btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>Posting…';
+  setTimeout(()=>{ // short delay simulates a network call
+    db.donations.push({id:Date.now(),donor:v.donor.trim(),food:v.food.trim(),qty:+v.qty,type:v.type,addr:v.addr.trim(),exp:new Date(v.exp).toISOString(),status:'available'});
+    log(`${v.donor.trim()} posted ${v.food.trim()}`);save();f.reset();
+    btn.disabled=false;btn.innerHTML='<i class="fa-solid fa-paper-plane"></i>Post donation';
+    toast('Donation posted. Volunteers can now claim it.');go('browse');
+  },600);
+});
+
+$('#reset').onclick=()=>{if(confirm('Reset all data to the demo set?')){db=seed();save();render();toast('Demo data restored.')}};
+render();
+</script>
+</body>
+</html>
